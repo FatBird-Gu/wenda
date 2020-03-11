@@ -1,8 +1,11 @@
 package com.nowcoder.wenda.contoller;
 
+import com.google.code.kaptcha.Producer;
 import com.nowcoder.wenda.entity.User;
 import com.nowcoder.wenda.service.UserService;
 import com.nowcoder.wenda.util.WendaConstant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,16 +13,30 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Map;
+
 
 @Controller
 public class LoginController implements WendaConstant {
 
+    private  static final Logger logger = LoggerFactory.getLogger(LoginController.class);
     @Autowired
     private UserService userService;
+    @Autowired
+    private Producer kaptchaProducer;
     @RequestMapping(path = "/register", method = RequestMethod.GET)
     public String getRegisterPage() {
         return "/site/register";
+    }
+    @RequestMapping(path = "/login", method = RequestMethod.GET)
+    public String getLoginPage() {
+        return "/site/login";
     }
 
     @RequestMapping(path = "/register", method = RequestMethod.POST)
@@ -55,8 +72,22 @@ public class LoginController implements WendaConstant {
         return "/site/operate-result";
     }
 
-    @RequestMapping(path = "/login", method = RequestMethod.GET)
-    public String getLoginPage() {
-        return "/site/login";
+    @RequestMapping(path = "/kaptcha", method = RequestMethod.GET)
+    public void getKaptcha(HttpServletResponse response, HttpSession session){
+        // 生存验证码
+        String text = kaptchaProducer.createText();
+        BufferedImage image = kaptchaProducer.createImage(text);
+        // 将验证码存入session
+        session.setAttribute("kaptcha",text);
+
+        // 将图片输出给浏览器
+        response.setContentType("image/png");
+        try {
+            OutputStream os = response.getOutputStream();
+            ImageIO.write(image, "png",os);
+        } catch (IOException e) {
+            logger.error("响应验证码失败："+e.getMessage());
+        }
     }
+
 }
