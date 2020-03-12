@@ -1,6 +1,8 @@
 package com.nowcoder.wenda.service;
 
+import com.nowcoder.wenda.dao.LoginTicketMapper;
 import com.nowcoder.wenda.dao.UserMapper;
+import com.nowcoder.wenda.entity.LoginTicket;
 import com.nowcoder.wenda.entity.User;
 import com.nowcoder.wenda.util.MailClient;
 import com.nowcoder.wenda.util.WendaConstant;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import javax.jws.Oneway;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +28,8 @@ public class UserService implements WendaConstant {
     private MailClient mailClient;
     @Autowired
     private TemplateEngine templateEngine;
+    @Autowired
+    private LoginTicketMapper loginTicketMapper;
 
     @Value("${wenda.path.domin}")
     private String domain;
@@ -99,5 +104,76 @@ public class UserService implements WendaConstant {
         }else{
             return ACTIVATION_FAILURE;
         }
+    }
+
+    public Map<String, Object> login(String username, String password, int expiredSeconds) {
+        Map<String, Object> map = new HashMap<>();
+        // 空值处理
+        if (StringUtils.isBlank(username)){
+            map.put("usernameMsg","账号不能为空");
+            return map;
+        }
+        if (StringUtils.isBlank(password)){
+            map.put("passwordMsg","密码不能为空");
+            return map;
+        }
+
+        //验证账号
+        User user = userMapper.selectByName(username);
+        if (user == null){
+            map.put("usernameMsg","账号不存在");
+            return map;
+        }
+        // 验证状态
+        if (user.getStatus() == 0){
+            map.put("usernameMsg","账号未激活");
+            return map;
+        }
+        //验证密码
+        password = WendaUtil.md5(password+user.getSalt());
+        if (!user.getPassword().equals(password)){
+            map.put("passwordMsg","密码不正确");
+            return map;
+        }
+
+        // 生成登录凭证
+        LoginTicket loginTicket = new LoginTicket();
+        loginTicket.setUserId(user.getId());
+        loginTicket.setTicket(WendaUtil.gennerateUUID());
+        loginTicket.setStatus(0);
+        loginTicket.setExpired(new Date(System.currentTimeMillis() + 1000 * expiredSeconds));
+        loginTicketMapper.insertLogininTicket(loginTicket);
+        map.put("ticket",loginTicket.getTicket());
+        return map;
+    }
+
+    public  void logout(String ticket){
+        loginTicketMapper.updateStatus(ticket,1);
+    }
+
+    public Map<String, Object> forget(String email){
+        Map<String, Object> map = new HashMap<>();
+        User user = userMapper.selectByEmail(email);
+        if (user == null){
+            map.put("usernameMsg","该用户不存在！");
+            return map;
+        }
+        String forgetCode = WendaUtil.gennerateUUID().substring(0,6);
+        Context context = new Context();
+        context.setVariable("email",email);
+        context.setVariable("code",forgetCode);
+        String text = templateEngine.process("/mail/forget",context);
+        mailClient.sendMail(email, "重置密码", text);
+        map.put("code",forgetCode);
+        return map;
+    }
+
+    public void changePassword(String email, String password){
+        User user = userMapper.selectByEmail(email);
+        if (user == null){
+            return;
+        }
+        String encodePass = WendaUtil.md5(password+user.getSalt());
+        userMapper.updatePassword(user.getId(),encodePass);
     }
 }

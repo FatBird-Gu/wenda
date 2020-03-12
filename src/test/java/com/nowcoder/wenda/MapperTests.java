@@ -1,8 +1,10 @@
 package com.nowcoder.wenda;
 
 import com.nowcoder.wenda.dao.DiscussPostMapper;
+import com.nowcoder.wenda.dao.LoginTicketMapper;
 import com.nowcoder.wenda.dao.UserMapper;
 import com.nowcoder.wenda.entity.DiscussPost;
+import com.nowcoder.wenda.entity.LoginTicket;
 import com.nowcoder.wenda.entity.User;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -18,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 @SpringBootTest
+@ContextConfiguration(classes = WendaApplication.class)
 
 public class MapperTests {
 
@@ -74,4 +77,26 @@ public class MapperTests {
         int rows = discussPostMapper.selectDiscussPostRows(149);
         System.out.println(rows);
     }
+
+    @Autowired
+    private LoginTicketMapper loginTicketMapper;
+
+    @Test
+    public void testInsertLogin(){
+        LoginTicket loginTicket = new LoginTicket();
+        loginTicket.setUserId(101);
+        loginTicket.setTicket("abc");
+        loginTicket.setStatus(0);
+        loginTicket.setExpired(new Date(System.currentTimeMillis()+1000 * 60 * 10));
+        loginTicketMapper.insertLogininTicket(loginTicket);
+    }
+
+    @Test
+    public void testSelectLoginTicket(){
+        LoginTicket loginTicket = loginTicketMapper.selectByTicket("abc");
+        System.out.println(loginTicket);
+
+        loginTicketMapper.updateStatus("abc",1);
+    }
+
 }
