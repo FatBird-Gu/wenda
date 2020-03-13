@@ -1,5 +1,6 @@
 package com.nowcoder.wenda.contoller;
 
+import com.nowcoder.wenda.annatation.LoginRequired;
 import com.nowcoder.wenda.entity.User;
 import com.nowcoder.wenda.service.UserService;
 import com.nowcoder.wenda.util.HostHolder;
@@ -39,11 +40,13 @@ public class UserController {
     @Autowired
     private HostHolder hostHolder;
 
+    @LoginRequired
     @RequestMapping(path = "/setting", method = RequestMethod.GET)
     public String getSettingPage() {
         return "/site/setting";
     }
 
+    @LoginRequired
     @RequestMapping(path = "/upload", method = RequestMethod.POST)
     public String uploadHeader(MultipartFile headerImage, Model model) {
         if (headerImage == null) {
@@ -99,6 +102,7 @@ public class UserController {
         }
     }
 
+    @LoginRequired
     @RequestMapping(path = "/password", method = RequestMethod.POST)
     public String changePassword(Model model, String password, String newpassword, @CookieValue("ticket")String ticket){
         if (StringUtils.isBlank(password)){
