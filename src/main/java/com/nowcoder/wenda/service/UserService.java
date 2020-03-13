@@ -170,10 +170,14 @@ public class UserService implements WendaConstant {
 
     public void changePassword(String email, String password){
         User user = userMapper.selectByEmail(email);
-        if (user == null){
+        if (user == null) {
             return;
         }
         String encodePass = WendaUtil.md5(password+user.getSalt());
         userMapper.updatePassword(user.getId(),encodePass);
+    }
+
+    public LoginTicket findLoginTicket(String ticket){
+        return loginTicketMapper.selectByTicket(ticket);
     }
 }
