@@ -19,8 +19,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Date;
 import java.util.List;
 
+
 @SpringBootTest
-@ContextConfiguration(classes = WendaApplication.class)
 
 public class MapperTests {
 
