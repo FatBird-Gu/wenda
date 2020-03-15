@@ -27,7 +27,7 @@ public class DiscussPostService {
         if (post == null){
             throw new IllegalArgumentException("参数不能为空!");
         }
-         // 转义HTML标记
+        // 转义HTML标记
         post.setTitle(HtmlUtils.htmlEscape(post.getTitle()));
         post.setContent(HtmlUtils.htmlEscape(post.getContent()));
 
@@ -39,5 +39,9 @@ public class DiscussPostService {
 
     public DiscussPost findDiscussPostById(int id) {
         return discussPostMapper.selectDiscussPostById(id);
+    }
+
+    public int updateCommentCount(int id, int commentCount){
+        return discussPostMapper.updateCommentCount(id,commentCount);
     }
 }
