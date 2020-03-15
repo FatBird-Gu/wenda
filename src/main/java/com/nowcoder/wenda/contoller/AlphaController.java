@@ -1,11 +1,17 @@
 package com.nowcoder.wenda.contoller;
 
+import com.nowcoder.wenda.dao.DiscussPostMapper;
+import com.nowcoder.wenda.dao.UserMapper;
+import com.nowcoder.wenda.entity.DiscussPost;
 import com.nowcoder.wenda.entity.User;
 import com.nowcoder.wenda.service.AlphaService;
 import com.nowcoder.wenda.util.WendaUtil;
 import com.sun.deploy.net.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -24,6 +30,8 @@ public class AlphaController {
 
     @Autowired
     private AlphaService alphaService;
+
+
 
     @RequestMapping("hello")
     @ResponseBody
@@ -193,4 +201,6 @@ public class AlphaController {
         System.out.println(age);
         return WendaUtil.getJSONString(0,"操作成功");
     }
+
+
 }
