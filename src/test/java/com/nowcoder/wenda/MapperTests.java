@@ -2,9 +2,11 @@ package com.nowcoder.wenda;
 
 import com.nowcoder.wenda.dao.DiscussPostMapper;
 import com.nowcoder.wenda.dao.LoginTicketMapper;
+import com.nowcoder.wenda.dao.MessageMapper;
 import com.nowcoder.wenda.dao.UserMapper;
 import com.nowcoder.wenda.entity.DiscussPost;
 import com.nowcoder.wenda.entity.LoginTicket;
+import com.nowcoder.wenda.entity.Message;
 import com.nowcoder.wenda.entity.User;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -99,4 +101,22 @@ public class MapperTests {
         loginTicketMapper.updateStatus("abc",1);
     }
 
+    @Autowired
+    private MessageMapper messageMapper;
+    @Test
+    public void testSelectLetters(){
+        List<Message> list = messageMapper.selectConversations(111,0,20);
+        for (Message msg : list){
+            System.out.println(msg);
+        }
+        int count = messageMapper.selectConversationCount(111);
+        System.out.println(count);
+
+        list = messageMapper.selectLetters("111_131",0,10);
+        for (Message msg : list){
+            System.out.println(msg);
+        }
+        count = messageMapper.selectLetterCount("111_131");
+        System.out.println(count);
+    }
 }
