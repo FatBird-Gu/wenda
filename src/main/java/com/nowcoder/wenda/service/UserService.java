@@ -187,4 +187,7 @@ public class UserService implements WendaConstant {
     public int updatePassword(int userId,String password){
         return userMapper.updatePassword(userId,password);
     }
+    public User findUserByName(String name){
+        return userMapper.selectByName(name);
+    }
 }
