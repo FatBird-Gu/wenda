@@ -4,7 +4,9 @@ import com.nowcoder.wenda.entity.DiscussPost;
 import com.nowcoder.wenda.entity.Page;
 import com.nowcoder.wenda.entity.User;
 import com.nowcoder.wenda.service.DiscussPostService;
+import com.nowcoder.wenda.service.LikeService;
 import com.nowcoder.wenda.service.UserService;
+import com.nowcoder.wenda.util.WendaConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-public class HomeController {
+public class HomeController implements WendaConstant {
 
     @Autowired
     private DiscussPostService discussPostService;
@@ -26,6 +28,8 @@ public class HomeController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private LikeService likeService;
     @RequestMapping(path = "/index", method = RequestMethod.GET)
     public String getIndexPage(Model model, Page page){
         // 方法调用之前 springmvc自动实例化Model与Page，并降Page自动注入Modal
@@ -40,6 +44,10 @@ public class HomeController {
                 map.put("post",post);
                 User user = userService.findUserById(post.getUserId());
                 map.put("user",user);
+
+                long likeCount = likeService.findEntityLikeCount(ENTITY_TYPE_POST, post.getId());
+                map.put("likeCount", likeCount);
+
                 discussPosts.add(map);
             }
         }
