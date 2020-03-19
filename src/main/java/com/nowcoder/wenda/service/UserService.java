@@ -190,4 +190,6 @@ public class UserService implements WendaConstant {
     public User findUserByName(String name){
         return userMapper.selectByName(name);
     }
+
+
 }

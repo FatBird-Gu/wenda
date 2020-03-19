@@ -2,6 +2,7 @@ package com.nowcoder.wenda.contoller;
 
 import com.nowcoder.wenda.annatation.LoginRequired;
 import com.nowcoder.wenda.entity.User;
+import com.nowcoder.wenda.service.LikeService;
 import com.nowcoder.wenda.service.UserService;
 import com.nowcoder.wenda.util.HostHolder;
 import com.nowcoder.wenda.util.WendaUtil;
@@ -39,6 +40,8 @@ public class UserController {
     private String context_path;
     @Autowired
     private HostHolder hostHolder;
+    @Autowired
+    private LikeService likeService;
 
     @LoginRequired
     @RequestMapping(path = "/setting", method = RequestMethod.GET)
@@ -123,5 +126,22 @@ public class UserController {
         userService.updatePassword(user.getId(),password);
         userService.logout(ticket);
         return "redirect:/index";
+    }
+
+    // 个人主页
+    @RequestMapping(path = "/profile/{userId}", method = RequestMethod.GET)
+    public String getProfilePage(@PathVariable("userId") int userId, Model model){
+        User user = userService.findUserById(userId);
+        if (user == null){
+            throw new RuntimeException("该用户不存在");
+        }
+
+        // 用户
+        model.addAttribute("user",user);
+        // 点赞数量
+        int count = likeService.findUserLikeCount(userId);
+        model.addAttribute("likeCount",count);
+
+        return "/site/profile";
     }
 }
