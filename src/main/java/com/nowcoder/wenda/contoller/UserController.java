@@ -2,9 +2,11 @@ package com.nowcoder.wenda.contoller;
 
 import com.nowcoder.wenda.annatation.LoginRequired;
 import com.nowcoder.wenda.entity.User;
+import com.nowcoder.wenda.service.FollowService;
 import com.nowcoder.wenda.service.LikeService;
 import com.nowcoder.wenda.service.UserService;
 import com.nowcoder.wenda.util.HostHolder;
+import com.nowcoder.wenda.util.WendaConstant;
 import com.nowcoder.wenda.util.WendaUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -27,7 +29,7 @@ import java.io.OutputStream;
 
 @Controller
 @RequestMapping("/user")
-public class UserController {
+public class UserController implements WendaConstant {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     @Autowired
@@ -42,6 +44,8 @@ public class UserController {
     private HostHolder hostHolder;
     @Autowired
     private LikeService likeService;
+    @Autowired
+    private FollowService followService;
 
     @LoginRequired
     @RequestMapping(path = "/setting", method = RequestMethod.GET)
@@ -141,7 +145,19 @@ public class UserController {
         // 点赞数量
         int count = likeService.findUserLikeCount(userId);
         model.addAttribute("likeCount",count);
-
+        // 关注数量
+        long followeeCount = followService.findFolloweeCount(userId, ENTITY_TYPE_USER);
+        model.addAttribute("followeeCount",followeeCount);
+        // 粉丝数量
+        long followerCount = followService.findFollowerCount( ENTITY_TYPE_USER, userId);
+        model.addAttribute("followerCount",followerCount);
+        // 是否关注
+        boolean hasFollowed = false;
+        if (hostHolder.getUser() != null){
+            hasFollowed = followService.hasFollowed(hostHolder.getUser().getId(),ENTITY_TYPE_USER, userId);
+        }
+        model.addAttribute("hasFollowed",hasFollowed);
         return "/site/profile";
     }
+
 }
