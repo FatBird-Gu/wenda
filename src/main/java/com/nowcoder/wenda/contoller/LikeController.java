@@ -1,8 +1,11 @@
 package com.nowcoder.wenda.contoller;
 
+import com.nowcoder.wenda.entity.Event;
 import com.nowcoder.wenda.entity.User;
+import com.nowcoder.wenda.event.EventProducer;
 import com.nowcoder.wenda.service.LikeService;
 import com.nowcoder.wenda.util.HostHolder;
+import com.nowcoder.wenda.util.WendaConstant;
 import com.nowcoder.wenda.util.WendaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Controller
-public class LikeController {
+public class LikeController implements WendaConstant {
 
     @Autowired
     private LikeService likeService;
@@ -22,9 +25,13 @@ public class LikeController {
     @Autowired
     private HostHolder hostHolder;
 
+    @Autowired
+    private EventProducer producer;
+
+
     @RequestMapping(path = "/like", method = RequestMethod.POST)
     @ResponseBody
-    public String like(int entityType, int entityId, int entityUserId){
+    public String like(int entityType, int entityId, int entityUserId, int postId){
         User user = hostHolder.getUser();
 
         // 点赞
@@ -37,6 +44,18 @@ public class LikeController {
         Map<String, Object> map = new HashMap<>();
         map.put("likeCount", likeCount);
         map.put("likeStatus",likeStatus);
+
+        // 触发点赞事件
+        if (likeStatus == 1){
+            Event event = new Event()
+                    .setTopic(TOPIC_LIKE)
+                    .setUserId(hostHolder.getUser().getId())
+                    .setEntityId(entityType)
+                    .setEntityId(entityId)
+                    .setEntityUserId(entityUserId)
+                    .setData("postId", postId);
+            producer.fireEvent(event);
+        }
 
         return WendaUtil.getJSONString(0,null,map);
     }

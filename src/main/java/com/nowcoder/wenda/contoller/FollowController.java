@@ -1,7 +1,9 @@
 package com.nowcoder.wenda.contoller;
 
+import com.nowcoder.wenda.entity.Event;
 import com.nowcoder.wenda.entity.Page;
 import com.nowcoder.wenda.entity.User;
+import com.nowcoder.wenda.event.EventProducer;
 import com.nowcoder.wenda.service.FollowService;
 import com.nowcoder.wenda.service.UserService;
 import com.nowcoder.wenda.util.HostHolder;
@@ -28,6 +30,8 @@ public class FollowController implements WendaConstant {
     private HostHolder hostHolder;
     @Autowired
     private UserService userService;
+    @Autowired
+    private EventProducer producer;
 
     @RequestMapping(path = "/follow", method = RequestMethod.POST)
     @ResponseBody
@@ -36,6 +40,14 @@ public class FollowController implements WendaConstant {
 
         followService.follow(user.getId(),entityType,entityId);
 
+        //触发关注事件
+        Event event = new Event()
+                .setTopic(TOPIC_FOLLOW)
+                .setUserId(hostHolder.getUser().getId())
+                .setEntityType(entityType)
+                .setEntityId(entityId)
+                .setEntityUserId(entityId);
+        producer.fireEvent(event);
         return WendaUtil.getJSONString(0,"已关注");
     }
 
