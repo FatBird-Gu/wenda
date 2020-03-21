@@ -3,6 +3,7 @@ package com.nowcoder.wenda.config;
 import com.nowcoder.wenda.contoller.interceptor.AlphaInterceptor;
 import com.nowcoder.wenda.contoller.interceptor.LoginRequiredInterceptor;
 import com.nowcoder.wenda.contoller.interceptor.LoginTicketInterceptor;
+import com.nowcoder.wenda.contoller.interceptor.MessageInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -16,6 +17,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private LoginTicketInterceptor loginTicketInterceptor;
     @Autowired
     private LoginRequiredInterceptor loginRequiredInterceptor;
+    @Autowired
+    private MessageInterceptor messageInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -27,6 +30,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/**/*.css", "/**/*.js", "/**/*.png", "/**/*.jpg", "/**/*.jpeg");
 
         registry.addInterceptor(loginRequiredInterceptor)
+                .excludePathPatterns("/**/*.css", "/**/*.js", "/**/*.png", "/**/*.jpg", "/**/*.jpeg");
+
+        registry.addInterceptor(messageInterceptor)
                 .excludePathPatterns("/**/*.css", "/**/*.js", "/**/*.png", "/**/*.jpg", "/**/*.jpeg");
     }
 
