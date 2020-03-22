@@ -52,6 +52,15 @@ public class CommentController implements WendaConstant {
             event.setEntityUserId(target.getUserId());
         }
         producer.fireEvent(event);
+
+        if (comment.getEntityType() == ENTITY_TYPE_POST){
+            event = new Event()
+                    .setTopic(TOPIC_PUBLISH)
+                    .setUserId(hostHolder.getUser().getId())
+                    .setEntityType(ENTITY_TYPE_POST)
+                    .setEntityId(discussPostId);
+            producer.fireEvent(event);
+        }
         return "redirect:/discuss/detail/"+discussPostId;
     }
 
