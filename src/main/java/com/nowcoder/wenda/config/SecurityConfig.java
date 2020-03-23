@@ -46,6 +46,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Wend
                     AUTHORITU_MODERATEOR,
                     AUTHORITY_USER
                 )
+                .antMatchers(
+                        "/discuss/top",
+                        "/discuss/wonderful"
+                )
+                .hasAnyAuthority(
+                        AUTHORITU_MODERATEOR
+                )
+                .antMatchers(
+                        "/discuss/delete")
+                .hasAnyAuthority(
+                        AUTHORITU_ADMIN
+                )
                 .anyRequest().permitAll()
                 .and().csrf().disable();
         //权限不够处理
