@@ -63,4 +63,17 @@ public interface WendaConstant {
      */
     int SYSTEM_USER_ID = 1;
 
+    /**
+     *
+     * 普通用户
+     */
+    String AUTHORITY_USER = "user";
+    /**
+     * 管理员
+     */
+    String AUTHORITU_ADMIN = "admin";
+    /**
+     * 版主
+     */
+    String AUTHORITU_MODERATEOR = "moderator";
 }
