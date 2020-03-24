@@ -58,6 +58,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Wend
                 .hasAnyAuthority(
                         AUTHORITU_ADMIN
                 )
+                .antMatchers(
+                        "/data/**"
+                ).hasAnyAuthority(
+                        AUTHORITU_ADMIN
+        )
                 .anyRequest().permitAll()
                 .and().csrf().disable();
         //权限不够处理
