@@ -1,6 +1,7 @@
 package com.nowcoder.wenda.config;
 
 import com.nowcoder.wenda.quartz.AlphaJob;
+import com.nowcoder.wenda.quartz.PostScoreRefreshJob;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.springframework.context.annotation.Bean;
@@ -19,7 +20,7 @@ public class QuartzConfig {
     // 4.该Bean得到的是FactoryBean所管理的对象实例.
 
     // 配置JobDetail
-     @Bean
+//     @Bean
     public JobDetailFactoryBean alphaJobDetail() {
         JobDetailFactoryBean factoryBean = new JobDetailFactoryBean();
         factoryBean.setJobClass(AlphaJob.class);
@@ -31,7 +32,7 @@ public class QuartzConfig {
     }
 
     // 配置Trigger(SimpleTriggerFactoryBean, CronTriggerFactoryBean)
-     @Bean
+//     @Bean
     public SimpleTriggerFactoryBean alphaTrigger(JobDetail alphaJobDetail) {
         SimpleTriggerFactoryBean factoryBean = new SimpleTriggerFactoryBean();
         factoryBean.setJobDetail(alphaJobDetail);
@@ -42,4 +43,27 @@ public class QuartzConfig {
         return factoryBean;
     }
 
+    // 刷新帖子分数任务
+    @Bean
+    public JobDetailFactoryBean postScoreRefreshJobDetail() {
+        JobDetailFactoryBean factoryBean = new JobDetailFactoryBean();
+        factoryBean.setJobClass(PostScoreRefreshJob.class);
+        factoryBean.setName("postScoreRefreshJob");
+        factoryBean.setGroup("communityJobGroup");
+        factoryBean.setDurability(true);
+        factoryBean.setRequestsRecovery(true);
+        return factoryBean;
+    }
+
+    // 配置Trigger(SimpleTriggerFactoryBean, CronTriggerFactoryBean)
+     @Bean
+    public SimpleTriggerFactoryBean postScoreRefreshTrigger(JobDetail postScoreRefreshJobDetail) {
+        SimpleTriggerFactoryBean factoryBean = new SimpleTriggerFactoryBean();
+        factoryBean.setJobDetail(postScoreRefreshJobDetail);
+        factoryBean.setName("postScoreRefreshTrigger");
+        factoryBean.setGroup("communityRefreshGroup");
+        factoryBean.setRepeatInterval(1000*60*5);
+        factoryBean.setJobDataMap(new JobDataMap());
+        return factoryBean;
+    }
 }

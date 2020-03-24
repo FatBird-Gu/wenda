@@ -5,9 +5,11 @@ import com.nowcoder.wenda.entity.User;
 import com.nowcoder.wenda.event.EventProducer;
 import com.nowcoder.wenda.service.LikeService;
 import com.nowcoder.wenda.util.HostHolder;
+import com.nowcoder.wenda.util.RedisKeyUtil;
 import com.nowcoder.wenda.util.WendaConstant;
 import com.nowcoder.wenda.util.WendaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -28,6 +30,8 @@ public class LikeController implements WendaConstant {
     @Autowired
     private EventProducer producer;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @RequestMapping(path = "/like", method = RequestMethod.POST)
     @ResponseBody
@@ -57,6 +61,11 @@ public class LikeController implements WendaConstant {
             producer.fireEvent(event);
         }
 
+        if (entityType == ENTITY_TYPE_POST){
+            // 计算帖子分数
+            String rediskey = RedisKeyUtil.getPostScoreKey();
+            redisTemplate.opsForSet().add(rediskey,entityId);
+        }
         return WendaUtil.getJSONString(0,null,map);
     }
 }

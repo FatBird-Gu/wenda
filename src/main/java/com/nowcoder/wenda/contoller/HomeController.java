@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,12 +32,14 @@ public class HomeController implements WendaConstant {
     @Autowired
     private LikeService likeService;
     @RequestMapping(path = "/index", method = RequestMethod.GET)
-    public String getIndexPage(Model model, Page page){
+    public String getIndexPage(Model model, Page page,
+                               @RequestParam(name = "orderMode",defaultValue = "0") int orderMode){
         // 方法调用之前 springmvc自动实例化Model与Page，并降Page自动注入Modal
         // 所以， thymeleaf中可以直接访问
         page.setRows(discussPostService.findDiscussPostRows(0));
-        page.setPath("/index");
-        List<DiscussPost> list = discussPostService.findDiscussPost(0,page.getOffset(),page.getLimit());
+        page.setPath("/index?orderMode="+orderMode);
+
+        List<DiscussPost> list = discussPostService.findDiscussPost(0,page.getOffset(),page.getLimit(),orderMode);
         List<Map<String, Object>> discussPosts = new ArrayList<>();
         if(list!=null){
             for (DiscussPost post:list){
@@ -52,6 +55,7 @@ public class HomeController implements WendaConstant {
             }
         }
         model.addAttribute("discussPosts",discussPosts);
+        model.addAttribute("orderMode",orderMode);
         return "/index";
     }
 

@@ -7,8 +7,10 @@ import com.nowcoder.wenda.event.EventProducer;
 import com.nowcoder.wenda.service.CommentService;
 import com.nowcoder.wenda.service.DiscussPostService;
 import com.nowcoder.wenda.util.HostHolder;
+import com.nowcoder.wenda.util.RedisKeyUtil;
 import com.nowcoder.wenda.util.WendaConstant;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,7 +22,8 @@ import java.util.Date;
 @Controller
 @RequestMapping("/comment")
 public class CommentController implements WendaConstant {
-
+    @Autowired
+    private  RedisTemplate redisTemplate;
     @Autowired
     private CommentService commentService;
     @Autowired
@@ -60,6 +63,9 @@ public class CommentController implements WendaConstant {
                     .setEntityType(ENTITY_TYPE_POST)
                     .setEntityId(discussPostId);
             producer.fireEvent(event);
+            // 计算帖子分数
+            String rediskey = RedisKeyUtil.getPostScoreKey();
+            redisTemplate.opsForSet().add(rediskey,discussPostId);
         }
         return "redirect:/discuss/detail/"+discussPostId;
     }

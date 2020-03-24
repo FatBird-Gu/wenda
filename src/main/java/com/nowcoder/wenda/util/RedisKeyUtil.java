@@ -11,6 +11,7 @@ public class RedisKeyUtil {
     private static final String PREFLIX_USER = "user";
     private static final String PREFLIX_UV = "uv";
     private static final String PREFLIX_DAU = "dau";
+    private static final String PREFLIX_POST = "post";
 
     // 生成某个实体的赞
     // like:entity:entityType:entityId -> set(userId)
@@ -66,5 +67,10 @@ public class RedisKeyUtil {
     // 区间活跃用户dau
     public static String getDAUKey(String start, String end){
         return PREFLIX_DAU+SPLIT+start+SPLIT+end;
+    }
+
+    // 帖子分数
+    public static String getPostScoreKey(){
+        return PREFLIX_POST+SPLIT+"score";
     }
 }
