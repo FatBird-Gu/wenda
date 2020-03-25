@@ -59,10 +59,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Wend
                         AUTHORITU_ADMIN
                 )
                 .antMatchers(
-                        "/data/**"
+                        "/data/**",
+                        "/actuator/**"
                 ).hasAnyAuthority(
                         AUTHORITU_ADMIN
-        )
+                )
                 .anyRequest().permitAll()
                 .and().csrf().disable();
         //权限不够处理
